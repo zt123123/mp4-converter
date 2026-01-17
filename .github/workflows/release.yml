@@ -96,13 +96,8 @@ jobs:
           Copy-Item "$($ffmpegDir.FullName)/bin/ffmpeg.exe" "src-tauri/binaries/${{ matrix.ffmpeg_name }}"
           Copy-Item "$($ffmpegDir.FullName)/bin/ffprobe.exe" "src-tauri/binaries/${{ matrix.ffprobe_name }}"
 
-      - name: Build frontend (Unix)
-        if: matrix.platform != 'windows-latest'
-        run: ./node_modules/.bin/vite build
-
-      - name: Build frontend (Windows)
-        if: matrix.platform == 'windows-latest'
-        run: node_modules\.bin\vite build
+      - name: Build frontend
+        run: npm exec vite build
 
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
