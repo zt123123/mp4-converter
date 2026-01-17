@@ -1,0 +1,109 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            args: --target aarch64-apple-darwin
+            target: aarch64-apple-darwin
+            ffmpeg_name: ffmpeg-aarch64-apple-darwin
+            ffprobe_name: ffprobe-aarch64-apple-darwin
+          - platform: macos-latest
+            args: --target x86_64-apple-darwin
+            target: x86_64-apple-darwin
+            ffmpeg_name: ffmpeg-x86_64-apple-darwin
+            ffprobe_name: ffprobe-x86_64-apple-darwin
+          - platform: ubuntu-22.04
+            args: ''
+            target: x86_64-unknown-linux-gnu
+            ffmpeg_name: ffmpeg-x86_64-unknown-linux-gnu
+            ffprobe_name: ffprobe-x86_64-unknown-linux-gnu
+          - platform: windows-latest
+            args: ''
+            target: x86_64-pc-windows-msvc
+            ffmpeg_name: ffmpeg-x86_64-pc-windows-msvc.exe
+            ffprobe_name: ffprobe-x86_64-pc-windows-msvc.exe
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-action@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install dependencies (Ubuntu)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      # FFmpeg setup for macOS
+      - name: Setup FFmpeg (macOS)
+        if: startsWith(matrix.platform, 'macos')
+        run: |
+          brew install ffmpeg
+          mkdir -p src-tauri/binaries
+          BREW_PREFIX=$(brew --prefix ffmpeg)
+          cp "$BREW_PREFIX/bin/ffmpeg" "src-tauri/binaries/${{ matrix.ffmpeg_name }}"
+          cp "$BREW_PREFIX/bin/ffprobe" "src-tauri/binaries/${{ matrix.ffprobe_name }}"
+          chmod +x src-tauri/binaries/*
+
+      # FFmpeg setup for Linux
+      - name: Setup FFmpeg (Linux)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          mkdir -p src-tauri/binaries
+          # Download static FFmpeg build
+          curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o ffmpeg.tar.xz
+          tar -xf ffmpeg.tar.xz
+          FFMPEG_DIR=$(ls -d ffmpeg-*-amd64-static)
+          cp "$FFMPEG_DIR/ffmpeg" "src-tauri/binaries/${{ matrix.ffmpeg_name }}"
+          cp "$FFMPEG_DIR/ffprobe" "src-tauri/binaries/${{ matrix.ffprobe_name }}"
+          chmod +x src-tauri/binaries/*
+
+      # FFmpeg setup for Windows
+      - name: Setup FFmpeg (Windows)
+        if: matrix.platform == 'windows-latest'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path src-tauri/binaries
+          # Download FFmpeg from gyan.dev (well-known Windows FFmpeg builds)
+          Invoke-WebRequest -Uri "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip" -OutFile ffmpeg.zip
+          Expand-Archive -Path ffmpeg.zip -DestinationPath .
+          $ffmpegDir = Get-ChildItem -Directory -Filter "ffmpeg-*-essentials_build" | Select-Object -First 1
+          Copy-Item "$($ffmpegDir.FullName)/bin/ffmpeg.exe" "src-tauri/binaries/${{ matrix.ffmpeg_name }}"
+          Copy-Item "$($ffmpegDir.FullName)/bin/ffprobe.exe" "src-tauri/binaries/${{ matrix.ffprobe_name }}"
+
+      - name: Build the app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'MP4 Converter v__VERSION__'
+          releaseBody: 'See the assets to download and install this version.'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}

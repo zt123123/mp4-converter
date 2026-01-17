@@ -1,0 +1,47 @@
+{
+  "name": "mp4-converter",
+  "private": true,
+  "version": "0.0.0",
+  "description": "一个基于 Tauri + React 的视频格式转换工具，支持将各种视频格式转换为 MP4",
+  "keywords": [
+    "mp4",
+    "video-converter",
+    "ffmpeg",
+    "tauri",
+    "react",
+    "desktop-app",
+    "video-processing"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "download-ffmpeg": "node scripts/download-ffmpeg.cjs",
+    "tauri": "npm run download-ffmpeg && tauri dev",
+    "tauri:build": "npm run download-ffmpeg && tauri build",
+    "tauri:build:windows": "npm run download-ffmpeg && tauri build --target x86_64-pc-windows-msvc",
+    "tauri:build:linux": "npm run download-ffmpeg && tauri build --target x86_64-unknown-linux-gnu"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.9.1",
+    "@tauri-apps/plugin-dialog": "^2.6.0",
+    "@tauri-apps/plugin-fs": "^2.4.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.9.6",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "@vitejs/plugin-react": "^4.0.1",
+    "eslint": "^8.44.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.1",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.0"
+  }
+}

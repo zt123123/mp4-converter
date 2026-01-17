@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Read(*)",
+      "Edit(*)",
+      "Write(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "Bash(npm run build:*)",
+      "Bash(cargo build:*)",
+      "Bash(npm run tauri:*)",
+      "Bash(npx tauri icon --help:*)",
+      "Bash(pkill:*)",
+      "Bash(ls:*)",
+      "Bash(cargo check:*)",
+      "Bash(node scripts/download-ffmpeg.js:*)",
+      "Bash(npm run download-ffmpeg:*)",
+      "Bash(npm run tauri:build:*)",
+      "Bash(cat:*)",
+      "Bash(open:*)"
+    ]
+  }
+}
