@@ -97,7 +97,7 @@ jobs:
           Copy-Item "$($ffmpegDir.FullName)/bin/ffprobe.exe" "src-tauri/binaries/${{ matrix.ffprobe_name }}"
 
       - name: Build frontend
-        run: npm exec vite build
+        run: npm run build:ci
 
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
