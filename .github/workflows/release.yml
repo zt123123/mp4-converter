@@ -43,7 +43,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -57,10 +56,18 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: Install frontend dependencies
-        run: npm ci --legacy-peer-deps
+        run: |
+          npm ci --legacy-peer-deps
+          echo "npm ci completed with exit code $?"
 
       - name: Verify vite installation
-        run: ls -la node_modules/.bin/ | head -20
+        run: |
+          echo "Checking node_modules..."
+          ls -la node_modules/ | head -10
+          echo "Checking node_modules/.bin..."
+          ls -la node_modules/.bin/ | head -20 || echo "node_modules/.bin not found"
+          echo "Checking vite..."
+          ls -la node_modules/vite/bin/ || echo "vite/bin not found"
 
       # FFmpeg setup for macOS
       - name: Setup FFmpeg (macOS)
