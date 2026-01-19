@@ -18,7 +18,12 @@
       "Bash(npm run download-ffmpeg:*)",
       "Bash(npm run tauri:build:*)",
       "Bash(cat:*)",
-      "Bash(open:*)"
+      "Bash(open:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(npm install)",
+      "Bash(npm view:*)"
     ]
   }
 }
