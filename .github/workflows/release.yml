@@ -57,7 +57,10 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: Install frontend dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
+
+      - name: Verify vite installation
+        run: ls -la node_modules/.bin/ | head -20
 
       # FFmpeg setup for macOS
       - name: Setup FFmpeg (macOS)
@@ -97,7 +100,7 @@ jobs:
           Copy-Item "$($ffmpegDir.FullName)/bin/ffprobe.exe" "src-tauri/binaries/${{ matrix.ffprobe_name }}"
 
       - name: Build frontend
-        run: npm run build:ci
+        run: node ./node_modules/vite/bin/vite.js build
 
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
