@@ -100,7 +100,10 @@ jobs:
       - name: Build frontend
         run: node ./node_modules/vite/bin/vite.js build
 
-      - name: Build the app
+      - name: Build Tauri app
+        run: ./node_modules/.bin/tauri build ${{ matrix.args }}
+
+      - name: Upload artifacts
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -110,4 +113,5 @@ jobs:
           releaseBody: 'See the assets to download and install this version.'
           releaseDraft: true
           prerelease: false
+          skipBuild: true
           args: ${{ matrix.args }}
