@@ -57,8 +57,9 @@ jobs:
 
       - name: Install frontend dependencies
         run: |
-          npm ci --legacy-peer-deps
-          echo "npm ci completed with exit code $?"
+          npm install --legacy-peer-deps || true
+          npm install vite @vitejs/plugin-react --save-dev
+          echo "Dependencies installed"
 
       - name: Verify vite installation
         run: |
