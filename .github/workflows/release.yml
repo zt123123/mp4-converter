@@ -58,17 +58,7 @@ jobs:
       - name: Install frontend dependencies
         run: |
           npm install --legacy-peer-deps || true
-          npm install vite @vitejs/plugin-react --save-dev
-          echo "Dependencies installed"
-
-      - name: Verify vite installation
-        run: |
-          echo "Checking node_modules..."
-          ls -la node_modules/ | head -10
-          echo "Checking node_modules/.bin..."
-          ls -la node_modules/.bin/ | head -20 || echo "node_modules/.bin not found"
-          echo "Checking vite..."
-          ls -la node_modules/vite/bin/ || echo "vite/bin not found"
+          npm install vite @vitejs/plugin-react react react-dom @tauri-apps/cli --save-dev
 
       # FFmpeg setup for macOS
       - name: Setup FFmpeg (macOS)
